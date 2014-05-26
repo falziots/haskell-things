@@ -63,9 +63,9 @@ truthTable p = [eval (replace p (zip v comb)) | comb <- allCombinations (length 
                where v = vars p
               
 truth :: P -> Truth
-truth p | all (\x -> x) (truthTable p) = Tautology
-        | any (\x -> x) (truthTable p) = Contingency
-        | otherwise                    = Contradiction
+truth p | all id (truthTable p) = Tautology
+        | any id (truthTable p) = Contingency
+        | otherwise             = Contradiction
 
 
 areEquivalent :: P -> P -> Bool
