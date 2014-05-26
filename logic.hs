@@ -80,7 +80,8 @@ reduce F       = F
 reduce (Var x) = Var x
 reduce (Not (Not p))            = reduce p
 reduce (And (Then p q) a)       = if p == a then reduce q else (And (Then (reduce p) (reduce q)) (reduce a))
---reduce (And (Then p q) (Not q)) = reduce (Not p)
+reduce (And (Then p q) (Not a)) = if q == a then reduce (Not p) else (And (Then (reduce p) (reduce q)) (reduce a))
+
 
 {-
 --prove :: P -> Proof
