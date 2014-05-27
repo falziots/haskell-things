@@ -1,9 +1,20 @@
 import Data.List
 import Control.Monad
+import Data.Maybe (fromMaybe)
 
-type V = Char
-data P = Var V | Not P | And P P | Or P P | Then P P | Iff P P | T | F
-         deriving (Show, Eq)
+
+data P = Var Char | Not P | And P P | Or P P | Then P P | Iff P P | T | F
+         deriving (Eq)
+
+instance Show P where
+    show T         = "T"
+    show F         = "F"
+    show (Not p)   = "(¬" ++ (show p) ++ ")"
+    show (And p q) = "(" ++ (show p) ++ "∧" ++ (show q) ++ ")"
+    show (Or p q)  = "(" ++ (show p) ++ "v" ++ (show q) ++ ")"
+    show (Then p q)= "(" ++ (show p) ++ "⇒" ++ (show q) ++ ")"
+    show (Iff p q) = "(" ++ (show p) ++ "⇔" ++ (show q) ++ ")"
+    show (Var x)   = [x] --Char to String
 
 data Truth = Contradiction | Contingency | Tautology
              deriving (Show, Eq)     
@@ -32,9 +43,7 @@ replace (And p q) r = And (replace p r) (replace q r)
 replace (Or p q) r  = Or (replace p r) (replace q r)
 replace (Then p q) r= Then (replace p r) (replace q r)
 replace (Iff p q) r = Iff (replace p r) (replace q r)
-replace (Var x) r   | (x, T) `elem` r = T
-                    | (x, F) `elem` r = F
-                    | otherwise       = Var x
+replace (Var x) r   = fromMaybe (Var x) (lookup x r)
 
 
 -- This function is used to get all the variables in the proposition.
@@ -61,7 +70,9 @@ allCombinations n = replicateM n [T, F]
 truthTable :: P -> [Bool]
 truthTable p = [eval (replace p (zip v comb)) | comb <- allCombinations (length v)] 
                where v = vars p
-              
+
+-- the "id" proceeds from the following reasoning:
+-- (\x -> x==True) = (\x -> x) = id
 truth :: P -> Truth
 truth p | all id (truthTable p) = Tautology
         | any id (truthTable p) = Contingency
@@ -69,7 +80,7 @@ truth p | all id (truthTable p) = Tautology
 
 
 areEquivalent :: P -> P -> Bool
-areEequivalent p q = truth (Iff p q) == Tautology
+areEquivalent p q = truth (Iff p q) == Tautology
 
 
 -- abides by the law that:
