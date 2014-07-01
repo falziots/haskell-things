@@ -1,4 +1,4 @@
-logic.hs
-========
+haskell-things
+==============
 
-yet another reinvention of the wheel
+random interesting haskell code
